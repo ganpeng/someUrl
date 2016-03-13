@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width initial-scale=1.0 user-scalable=no">
+	<title>Document</title>
+	<style>
+	* {
+		margin:0;
+		padding:0;
+	}
+	body, html {
+		height:100%;
+		width:100%;
+		overflow:hidden;
+	}
+	html {
+		font-size:16px;
+	}
+	.wrapper {
+		position:fixed;
+		bottom:0;
+		width:100%;
+		height:5rem;
+		padding:0 1rem;
+		box-sizing:border-box;
+		background-color:red;
+	}
+	.circle {
+		width:2.5rem;	
+		height:2.5rem;
+		border-radius:50%;
+		background-color:pink;
+	}
+	.bar {
+		position:absolute;
+		top:50%;
+		left:50%;
+		width:80%;
+		height:0.4rem;
+		margin-top:-0.2rem;
+		margin-left:-40%;
+		background-color:black;
+	}
+	</style>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="bar"></div>
+		<div class="circle"></div>
+	</div>	
+	<script src="libs/hammerjs/hammer.min.js"></script>
+	<script>
+		;!(function() {
+			var obj = document.querySelector('.circle')
+			var wrapper = document.querySelector('.wrapper')
+			var bar = document.querySelector('.bar')
+			var posX = 0
+			var posY = (wrapper.offsetHeight - obj.offsetWidth) / 2
+			var lastPosX = 0
+			var lastPosY = posY
+			var mc = new Hammer.Manager(obj);
+			mc.add(new Hammer.Pan({direction : Hammer.DIRECTION_HORIZONTAL}))
+			mc.on('panmove panend',onPan)
+			console.log(posY)
+			obj.style.transform = 'translate(' + posX + 'px, ' + posY + 'px)'
+			obj.style.webkitTransform = 'translate(' + posX + 'px, ' + posY + 'px)'
+			function onPan(ev) {
+				ev.preventDefault()
+                if (ev.type === 'panmove') {
+                	posX = ev.deltaX + lastPosX;
+                	posY = lastPosY;
+                	if ( posX < 0 ) {
+                		posX = 0
+                	} else if( posX > bar.offsetWidth) {
+                		posX = bar.offsetWidth
+                	}
+                } else if( ev.type === 'panend' ) {
+                	if (posX < bar.offsetWidth / 4) {
+                		posX = 0
+                	}
+                	if (posX > bar.offsetWidth / 4 && posX < bar.offsetWidth / 2) {
+                		posX = bar.offsetWidth / 2
+                	}
+                	if (posX > bar.offsetWidth / 2 && posX < (bar.offsetWidth / 4) * 3) {
+                		posX = bar.offsetWidth / 2
+                	}
+                	if (posX > (bar.offsetWidth / 4) * 3 && posX < bar.offsetWidth) {
+                		posX = bar.offsetWidth
+                	}
+                	lastPosX = posX;
+                	lastPosY = posY;
+                }
+                transform =
+                    "translate(" + posX + "px," + posY + "px)";
+                obj.style.transform = transform;
+                obj.style.webkitTransform = transform;
+			}
+		})();
+	</script>
+</body>
+</html>
